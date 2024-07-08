@@ -1,15 +1,27 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { AntDesign } from "@expo/vector-icons";
 import TabBarButton from "./tabb-bar-button";
+import {
+  ParamListBase,
+  Descriptor,
+  TabNavigationState,
+} from "@react-navigation/native";
 
-const TabBar = ({ state, descriptors, navigation }) => {
+import { NavigationHelpers } from "@react-navigation/native";
+
+type Props = {
+  state: TabNavigationState<ParamListBase>;
+  descriptors: Descriptor<ParamListBase, any, any>[];
+  navigation: NavigationHelpers<ParamListBase, any>;
+};
+
+const TabBar = ({ state, descriptors, navigation }: Props) => {
   const primaryColor = "#0891b2";
   const greyColor = "#737373";
   return (
     <View style={styles.tabbar}>
       {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
+        const { options } = descriptors[route.key as any];
         const label =
           options.tabBarLabel !== undefined
             ? options.tabBarLabel
@@ -28,29 +40,21 @@ const TabBar = ({ state, descriptors, navigation }) => {
             type: "tabPress",
             target: route.key,
             canPreventDefault: true,
-          });
+          }) as { defaultPrevented?: boolean };
 
           if (!isFocused && !event.defaultPrevented) {
             navigation.navigate(route.name, route.params);
           }
         };
 
-        const onLongPress = () => {
-          navigation.emit({
-            type: "tabLongPress",
-            target: route.key,
-          });
-        };
-
         return (
           <TabBarButton
             key={route.name}
             onPress={onPress}
-            onLongPress={onLongPress}
             isFocused={isFocused}
             routeName={route.name}
             color={isFocused ? primaryColor : greyColor}
-            label={label}
+            label={label as string}
           />
         );
       })}
